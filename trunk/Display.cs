@@ -39,13 +39,6 @@ namespace tankzor
 		Graphics		   g;
 		Game			   game;
 		
-		void Button1Click(object sender, EventArgs e)	{
-			//g = Graphics.FromHwnd(this.Handle);
- 			//updaterThread = new Thread(new ThreadStart(this.run));
- 			//updaterThread.Start();
-		}
-
-		
 		public void run() {
 			Color cb = Color.AntiqueWhite;
 			
@@ -55,25 +48,28 @@ namespace tankzor
 				
 				try {
 					
-				
+				// TODO: Does this help framerates/speed?
+				for ( int i = 0 ; i < 60;i++ ) {
+						
 				this.Invoke((MethodInvoker) delegate() {
- 					    
+ 					 
 			        long start = System.DateTime.Now.Ticks;
-			        
 			        game.redraw(sprites);
 				    game.deleteDestroyed(sprites);
 				    game.collisions(sprites);
-			        
-			        System.Threading.Thread.Sleep(10);
-					g.Clear(cb);
-					
-					long end = System.DateTime.Now.Ticks;
-                    long elapsed = (end - start) / 10000; // c
+				    game.runFutures();
+        			
+                    int st = 20-(int)((System.DateTime.Now.Ticks-start)/10000);
+                    if ( st > 0 )
+                    	System.Threading.Thread.Sleep(st);
                     
+					g.Clear(cb);
                     //Console.WriteLine("Redraw = "+elapsed);
 
 			    });
-				
+					}
+					
+					
 				} catch ( NullReferenceException e ) {
 					
 					Console.WriteLine(e.ToString());
@@ -97,10 +93,11 @@ namespace tankzor
 		void DisplayShown(object sender, EventArgs e)
 		{
 			g = Graphics.FromHwnd(this.Handle);
+ 			game = new Game(g, kbc);
+
  			updaterThread = new Thread(new ThreadStart(this.run));
  			updaterThread.Start();
  			
- 			game = new Game(g, kbc);
  			
 			
 		}

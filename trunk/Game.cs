@@ -23,7 +23,10 @@ namespace tankzor
 	{
 		KeyBoardController kbc;
 		Graphics		   g;
-
+		ArrayList 		   futures = new ArrayList();
+		ArrayList		   sprites;
+		int 			   tick = 0;
+		
 		public Game(Graphics g, KeyBoardController kbc)
 		{
 			this.g = g;
@@ -48,6 +51,12 @@ namespace tankzor
  			sprites.Add(sprite2);
  			sprites.Add(sprite3);
 
+ 			sprite = new TextDisplaySprite();
+ 			sprite.setController(new TextDisplayController());
+ 			sprites.Add(sprite);
+
+ 			this.sprites = sprites;
+ 			
  			return sprites;
 		}
 		
@@ -89,15 +98,36 @@ namespace tankzor
 		}
 		
 		public void redraw(ArrayList sprites) {
-			
+		 	tick++;
+		 	
 			for ( int x=0;x<sprites.Count;x++ ) {
 			    Sprite csprite = (Sprite)sprites[x];
- 				csprite.tick(sprites);
+ 				csprite.tick(sprites, this);
  				csprite.draw(g);
  						
 			}
 			
 		}
+		
+		public void addFuture(int when, Future f) {
+			futures.Add(new Object[]{tick+when,f});
+		}
+		
+		public void runFutures() {
+			ArrayList deletes = new ArrayList();
+			
+			foreach ( Object [] f in futures ) {
+				if ( tick == (int)(f[0]) ) {
+					((Future)f[1]).run();
+					deletes.Add(f);
+				}
+			}
+			
+			foreach ( Object [] f in deletes ) 
+				futures.Remove(f);
+		}
 
 	}
+	
+	
 }
