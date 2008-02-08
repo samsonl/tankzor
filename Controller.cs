@@ -14,6 +14,8 @@ using System.Threading;
 using System.Drawing.Drawing2D;
 using System.Collections;
 
+using System.Net.Sockets;
+
 namespace tankzor
 {
 
@@ -23,7 +25,7 @@ namespace tankzor
 		int getX();
 		int getY();
 		int getDirection();
-		void tick(ArrayList sprites, Sprite sprite);
+		void tick(ArrayList sprites, Sprite sprite, Game game);
 		
 	}
 
@@ -47,7 +49,7 @@ namespace tankzor
 			return direction;
 			
 		}
-		public  virtual void tick(ArrayList sprites, Sprite sprite) {
+		public  virtual void tick(ArrayList sprites, Sprite sprite, Game game) {
 			
 		}
 		
@@ -84,7 +86,7 @@ namespace tankzor
 
 		}
 		
-		public override void tick(ArrayList sprites, Sprite sprite) {
+		public override void tick(ArrayList sprites, Sprite sprite, Game game) {
 			x = x + xinc;
 			y = y + yinc;
 		
@@ -97,7 +99,9 @@ namespace tankzor
 				sprites.Add(bullet);
 				
 				fire = false;
+				game.addFuture(100,new PrintFuture());
 
+				game.addFuture(100,new BombFuture(sprites, sprite));
 			}
 		}
 	}
@@ -113,7 +117,7 @@ namespace tankzor
 			this.direction = direction;
 		}
 
-		public override void tick(ArrayList sprites, Sprite sprite) {
+		public override void tick(ArrayList sprites, Sprite sprite, Game game) {
 			x=x+xinc;
 			y=y+yinc;
 
@@ -128,7 +132,7 @@ namespace tankzor
 	
 	class ProjectileController : BaseController {
 		int velocity = 0;
-		int lifeTime = 30;
+		int lifeTime = 300;
 		
 		public ProjectileController(int x, int y, int direction, int speed) {
 			this.x = x;
@@ -137,7 +141,7 @@ namespace tankzor
 			this.velocity = speed;
 		}
 
-		public override void tick(ArrayList sprites, Sprite sprite) {
+		public override void tick(ArrayList sprites, Sprite sprite, Game game) {
 			int xinc = lookup[direction,0]*velocity;
 			int yinc = lookup[direction,1]*velocity;
 
@@ -153,9 +157,9 @@ namespace tankzor
 
 	class TrackerController : BaseController {
 		int velocity = 0;
-		int lifeTime = 30;
+		int lifeTime = 200;
 		Sprite target = null;
-		
+			
 		public TrackerController(int x, int y, int direction, int speed) {
 			this.x = x;
 			this.y = y;
@@ -163,7 +167,7 @@ namespace tankzor
 			this.velocity = speed;
 		}
 
-		public override void tick(ArrayList sprites, Sprite sprite) {
+		public override void tick(ArrayList sprites, Sprite sprite, Game game) {
 			
 			if ( target == null ) {
 				foreach ( Sprite csp in sprites ) {
@@ -189,7 +193,46 @@ namespace tankzor
 			}
 			
 		}
+
+	}
+	
+	class TextDisplayController : BaseController {
+		String str = "OK";
+		int tickc = 0;
+		
+		public TextDisplayController() {
+		}
+
+		public override void tick(ArrayList sprites, Sprite sprite, Game game) {
+			this.str = "GAME TICK : "+tickc++;
+			
+			
+		}
+	
+		public String getStr() {
+			return this.str;
+			
+		}
+	
 	}
 
 
+	class TCPController : BaseController {
+		TcpListener s ;
+		TcpClient c;
+		GraphicsPath g;
+			
+			
+		public TCPController() {
+		}
+
+		public override void tick(ArrayList sprites, Sprite sprite, Game game) {
+		}
+	
+	
+	}
+
 }
+
+
+

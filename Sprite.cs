@@ -25,7 +25,7 @@ namespace tankzor
 		int getX();
 		int getY();
 		int getDirection();
-		void tick(ArrayList sprites);
+		void tick(ArrayList sprites, Game game);
 		void destroy();
 		bool isDestroyed();
 		RectangleF getBounds();
@@ -67,7 +67,10 @@ namespace tankzor
 			return this.direction;
 			
 		}
-		public abstract void tick(ArrayList sprites);
+
+		public virtual void tick(ArrayList sprites, Game game) {
+			controller.tick(sprites, this, game);
+		}
 			
 		
 		public virtual void destroy() {
@@ -106,8 +109,8 @@ namespace tankzor
 			health = health - 1;
 		}
 		
-    	public override void tick(ArrayList sprites) {
-			controller.tick(sprites, this);
+    	public override void tick(ArrayList sprites, Game game) {
+			controller.tick(sprites, this, game);
 		}
 		
 		public override void draw(Graphics g) {
@@ -149,8 +152,8 @@ namespace tankzor
 			
 		}
 
-		public override void tick(ArrayList sprites) {
-			controller.tick(sprites, this);
+		public override void tick(ArrayList sprites, Game game) {
+			controller.tick(sprites, this, game);
 		}
 		public override void draw(Graphics g) {
 			int			x         	= getX();
@@ -190,8 +193,8 @@ namespace tankzor
 			
 		}
 
-		public override void tick(ArrayList sprites) {
-			controller.tick(sprites, this);
+		public override void tick(ArrayList sprites, Game game) {
+			controller.tick(sprites, this, game);
 		}
 		public override void draw(Graphics g) {
 			int			x         	= getX();
@@ -214,6 +217,48 @@ namespace tankzor
  			g.DrawPath(p,path);
  			
  			this.bounds = path.GetBounds();
+		}
+	}
+
+	
+	public class TextDisplaySprite : BaseSprite  {
+		int size = 1;
+		int wait = 10;
+		
+		public TextDisplaySprite() {
+		}
+
+		public override void collision(Sprite sprite) {
+			
+		}
+		
+		public override void draw(Graphics g) {
+			GraphicsPath path = new GraphicsPath();
+			Matrix			trans 		= new Matrix();
+			Matrix			enlarge	= new Matrix();
+ 			Color 			c  			= Color.Black;
+			Pen   			p  			= new Pen(c);
+			Brush			b 			= Brushes.Black;
+
+			// TODO: This is clunky
+			String str = ((TextDisplayController)(this.getController())).getStr();
+			
+			path.AddString(str,FontFamily.GenericMonospace,0,12,new PointF(0,12),StringFormat.GenericDefault);
+ 
+			trans.Translate(x,y);
+			enlarge.Scale(size,size);
+			
+ 			path.Transform(trans);
+ 			path.Transform(enlarge);
+ 			g.DrawPath(p,path);
+ 			
+ 			this.bounds = path.GetBounds();
+			/* 		
+ 			if ( wait -- == 0 ) {
+ 				wait = 20;
+   			    if ( size++ > 3 ) size = 1;
+ 			}
+ 			*/
 		}
 	}
 
